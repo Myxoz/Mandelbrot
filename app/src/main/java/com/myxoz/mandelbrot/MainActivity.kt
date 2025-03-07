@@ -72,14 +72,13 @@ fun calculateMandelbrotBitmap(
     val canvas = android.graphics.Canvas(bitmap)
     val paint = Paint()
     val widthToHeightRatio = width / height.toDouble()
-    val totalHeight = zoom
-    val totalWidth = totalHeight * widthToHeightRatio
+    val totalWidth = zoom * widthToHeightRatio
     val left = centerX - totalWidth / 2
-    val top = centerY - totalHeight / 2
+    val top = centerY - zoom / 2
     val gridWidth = width / resolution
     val gridHeight = height / resolution
     val stepX = (totalWidth / width) * resolution
-    val stepY = (totalHeight / height) * resolution
+    val stepY = (zoom / height) * resolution
     for (gy in 0 until gridHeight) {
         for (gx in 0 until gridWidth) {
             val cx = left + gx * stepX
@@ -128,19 +127,17 @@ fun MandelbrotBitmapView() {
         }
     }
 
-    bitmapState.let { bmp ->
-        Image(bitmap = bmp.asImageBitmap(), contentDescription = "Mandelbrot Set", modifier = Modifier.fillMaxSize()
-            .pointerInput(Unit) {
-                detectTransformGestures(
-                    onGesture = { _, pan, zoomChange, _ ->
-                        resolution = HIGH_RES
-                        zoom /= zoomChange
-                        centerX -= pan.x * zoom / height.toDouble()
-                        centerY -= pan.y * zoom / height.toDouble()
-                    }
-                )
-            }.background(Color.Black),
-            contentScale = ContentScale.Crop
-        )
-    }
+    Image(bitmap = bitmapState.asImageBitmap(), contentDescription = "Mandelbrot Set", modifier = Modifier.fillMaxSize()
+        .pointerInput(Unit) {
+            detectTransformGestures(
+                onGesture = { _, pan, zoomChange, _ ->
+                    resolution = HIGH_RES
+                    zoom /= zoomChange
+                    centerX -= pan.x * zoom / height.toDouble()
+                    centerY -= pan.y * zoom / height.toDouble()
+                }
+            )
+        }.background(Color.Black),
+        contentScale = ContentScale.Crop
+    )
 }
